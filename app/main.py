@@ -10,10 +10,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Define allowed origins (Frontend URL)
 origins = [
-    "http://127.0.0.1:5500",  # Your frontend running on this port
-    "http://localhost:5500",
-    "https://justinnonso05.github.io/url-insights-frontend/", 
-    "https://justinnonso05.github.io/" # Alternative localhost URL
+    "https://justinnonso05.github.io" # Alternative localhost URL
 ]
 # Enable CORS middleware
 app.add_middleware(
