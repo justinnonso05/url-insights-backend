@@ -11,6 +11,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 # Define allowed origins (Frontend URL)
 origins = [
     "https://justinnonso05.github.io",
+    "https://url-insights.vercel.app/",
     "http://127.0.0.1:5500" # Alternative localhost URL
 ]
 # Enable CORS middleware
