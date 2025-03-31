@@ -7,6 +7,7 @@ from app.services import summarizer
 from app.utils.auth import decode_access_token
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, HTTPBasic, HTTPBasicCredentials
 import logging
+import json
 
 security = HTTPBearer(auto_error=False)  # Make authentication optional
 router = APIRouter()
@@ -18,43 +19,47 @@ async def summarize(
     db: Session = Depends(get_db)
 ):
     user = None
-    
-    # Check if user is authenticated
+
+    # Authenticate user
     if credentials:
         try:
             token = credentials.credentials
             payload = decode_access_token(token)
             user_email = payload.get("sub")
-            
+
             if user_email:
                 user = db.query(User).filter(User.email == user_email).first()
         except Exception as e:
             logging.warning(f"Authentication error: {str(e)}")
-            # Continue as anonymous user if token is invalid
-    
+
     # Generate summary
-    summarized_text = await summarizer.summarize_text(url)
-    
-    # If user is authenticated, store the summary
+    summarized_text = await summarizer.summarize_text(url)  # likely returns a dict
+
+    # Store summary only if user is authenticated
     if user:
-        new_summary = Summary(url=url, content=summarized_text, user_id=user.id)
+        new_summary = Summary(
+            url=url, 
+            content=json.dumps(summarized_text),  # ✅ Convert dict to JSON before storing
+            user_id=user.id
+        )
         db.add(new_summary)
         db.commit()
         db.refresh(new_summary)
-        
+
         return {
             "id": new_summary.id,
             "url": new_summary.url,
-            "summary": new_summary.content,
+            "summary": summarized_text,  # Keep this as a dict in the response
             "saved": True
         }
-    
-    # For anonymous users, just return the summary without storing
+
+    # For anonymous users, return the summary without saving
     return {
         "url": url,
         "summary": summarized_text,
         "saved": False
     }
+
 
 @router.get("/my-summaries")
 async def my_summaries(
