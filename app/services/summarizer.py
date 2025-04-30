@@ -23,4 +23,5 @@ async def summarize_text(url):
     model = genai.GenerativeModel("gemini-1.5-flash")
     summary = await asyncio.to_thread(model.generate_content, f"Summarize this text: '{text}'")
 
-    return {"summary": summary.text}
+    print(summary.text)  # Debugging line to check the summary content
+    return summary.text

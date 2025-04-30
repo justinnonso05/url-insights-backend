@@ -39,7 +39,7 @@ async def summarize(
     if user:
         new_summary = Summary(
             url=url, 
-            content=json.dumps(summarized_text),  # ✅ Convert dict to JSON before storing
+            content=summarized_text, 
             user_id=user.id
         )
         db.add(new_summary)
